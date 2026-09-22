@@ -35,7 +35,6 @@
       transition: opacity 1s ease;
     }
 
-    /* فيديو الخلفية (منظر طبيعي خلاب) */
     .bg-video {
       position: absolute;
       top: 0;
@@ -46,7 +45,6 @@
       opacity: 0.85;
     }
 
-    /* زر بدء العرض */
     #start-btn {
       position: relative;
       z-index: 20;
@@ -68,7 +66,6 @@
       background: rgba(255, 255, 255, 0.3);
     }
 
-    /* نص السلام بعد 3 ثواني */
     #greeting-text {
       position: absolute;
       z-index: 20;
@@ -81,7 +78,7 @@
       animation: fadeIn 0.8s ease forwards;
     }
 
-    /* --- المشهد الثاني: عالم البنات والوردة --- */
+    /* --- المشهد الثاني: عالم البنات والوردة والشاورما --- */
     #scene-flower {
       position: fixed;
       top: 0;
@@ -94,7 +91,6 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      /* خلفية متدرجة أنيقة تعبر عن عالم البنات */
       background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #feada6 100%);
       transition: opacity 1.5s ease;
       padding: 20px;
@@ -106,25 +102,41 @@
       font-weight: 700;
       color: #fff;
       text-shadow: 0 2px 10px rgba(214, 51, 132, 0.4);
-      margin-bottom: 25px;
+      margin-bottom: 15px;
       animation: bounce 2s infinite;
     }
 
-    /* تصميم وردة حمراء تفاعلية أنيقة */
+    .click-hint {
+      font-size: 0.95rem;
+      color: #ffffff;
+      background: rgba(0, 0, 0, 0.15);
+      padding: 6px 16px;
+      border-radius: 20px;
+      margin-bottom: 15px;
+    }
+
+    /* الوردة / الشاورما التفاعلية */
     .flower-container {
       position: relative;
-      width: 160px;
-      height: 160px;
-      margin: 20px 0;
+      width: 180px;
+      height: 180px;
+      margin: 10px 0;
       display: flex;
       justify-content: center;
       align-items: center;
+      cursor: pointer;
+      user-select: none;
     }
 
-    .rose-emoji {
-      font-size: 8rem;
+    .interactive-emoji {
+      font-size: 8.5rem;
       filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.15));
       animation: pulse 2s infinite ease-in-out;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .interactive-emoji:active {
+      transform: scale(0.8);
     }
 
     .message-text {
@@ -137,10 +149,11 @@
       border-radius: 30px;
       border: 1px solid rgba(255, 255, 255, 0.5);
       box-shadow: 0 8px 32px 0 rgba(255, 105, 180, 0.2);
-      margin-top: 25px;
+      margin-top: 20px;
+      transition: all 0.5s ease;
     }
 
-    /* التأثيرات الحركية (Animations) */
+    /* Animations */
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.9); }
       to { opacity: 1; transform: scale(1); }
@@ -155,38 +168,44 @@
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-8px); }
     }
+
+    .pop-animation {
+      animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.3) rotate(-20deg); opacity: 0; }
+      50% { transform: scale(1.3) rotate(10deg); }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- المشهد الأول: فيديو المنظر الخلاب والموسيقى -->
+  <!-- المشهد الأول -->
   <div id="scene-video">
-    <!-- فيديو منظر طبيعي خلاب للجبال والغيوم (طبيعة بجودة عالية) -->
     <video id="myVideo" class="bg-video" loop playsinline preload="auto">
       <source src="https://assets.mixkit.co/videos/preview/mixkit-dramatic-time-lapse-of-clouds-and-mountains-4220-large.mp4" type="video/mp4">
     </video>
 
-    <!-- زر للبدء لتشغيل الصوت والفيديو بسلاسة -->
     <button id="start-btn" onclick="startExperience()">✨ Cliquez ici pour commencer</button>
-
-    <!-- كلمة السَلام -->
     <div id="greeting-text">Slm Slfd</div>
   </div>
 
-  <!-- صوت موسيقى هادئة وجميلة خلف المنظر الخلاب -->
   <audio id="bgMusic" loop preload="auto">
     <source src="https://assets.mixkit.co/music/preview/mixkit-beautiful-dream-493.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- المشهد الثاني: عالم البنات والوردة -->
+  <!-- المشهد الثاني -->
   <div id="scene-flower">
-    <div class="title-text">haki hdi werda 🌹</div>
+    <div class="title-text" id="main-title">haki hdi werda 🌹</div>
+    <div class="click-hint" id="hint-text">👉 Cliquez sur la rose !</div>
     
-    <div class="flower-container">
-      <div class="rose-emoji">🌹</div>
+    <div class="flower-container" onclick="transformToShawarma()">
+      <div class="interactive-emoji" id="emoji-display">🌹</div>
     </div>
 
-    <div class="message-text">
+    <div class="message-text" id="sub-message">
       Tahya nti a vie slfd🫶🏼
     </div>
   </div>
@@ -200,16 +219,13 @@
       const sceneVideo = document.getElementById('scene-video');
       const sceneFlower = document.getElementById('scene-flower');
 
-      // إخفاء الزر وتشغيل الفيديو والموسيقى
       startBtn.style.display = 'none';
       video.play();
       music.play();
 
-      // بعد 3 ثواني بالضبط: يظهر نص "Slm Slfd"
       setTimeout(() => {
         greeting.style.display = 'block';
 
-        // بعد ظهور النص بثانيتين: تنتقل الشاشة إلى عالم البنات
         setTimeout(() => {
           sceneVideo.style.opacity = '0';
           
@@ -221,6 +237,35 @@
         }, 2000);
 
       }, 3000);
+    }
+
+    // ميزة الضغط على الوردة للتحول إلى شاورما
+    let isShawarma = false;
+
+    function transformToShawarma() {
+      const emojiDisplay = document.getElementById('emoji-display');
+      const mainTitle = document.getElementById('main-title');
+      const subMessage = document.getElementById('sub-message');
+      const hintText = document.getElementById('hint-text');
+
+      // إعادة تفعيل الحركة
+      emojiDisplay.classList.remove('pop-animation');
+      void emojiDisplay.offsetWidth; // Trigger reflow
+      emojiDisplay.classList.add('pop-animation');
+
+      if (!isShawarma) {
+        emojiDisplay.textContent = '🥙';
+        mainTitle.textContent = 'Bsahtek shawirma a chaba 🌝🥙';
+        subMessage.textContent = 'Shawirma Special Edition 🌯❤️';
+        hintText.textContent = '✨ Clique encore pour la rose !';
+        isShawarma = true;
+      } else {
+        emojiDisplay.textContent = '🌹';
+        mainTitle.textContent = 'haki hdi werda 🌹';
+        subMessage.textContent = 'Tahya nti a vie slfd🫶🏼';
+        hintText.textContent = '👉 Cliquez sur la rose !';
+        isShawarma = false;
+      }
     }
   </script>
 </body>
