@@ -3,351 +3,224 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Private Chat - WE ZIN</title>
+  <title>Pour Soulefed ✨</title>
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     body, html {
       width: 100%;
       height: 100%;
-      background-color: #0d0d0d;
-      color: #fff;
+      background-color: #000000;
+      color: #ffffff;
       overflow: hidden;
     }
 
-    /* --- شاشة الترحيب السوداء --- */
-    #intro-screen {
+    /* --- المشهد الأول: الفيديو والموسيقى --- */
+    #scene-video {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: #000000;
+      z-index: 10;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      z-index: 9999;
-      transition: opacity 1.2s ease, visibility 1.2s;
-    }
-
-    .welcome-text {
-      font-size: 2.8rem;
-      font-weight: 800;
-      letter-spacing: 4px;
-      color: #ffffff;
-      text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeInUp 1.5s ease forwards 0.5s;
-      text-align: center;
-    }
-
-    .sub-text {
-      font-size: 1rem;
-      color: #888;
-      margin-top: 15px;
-      opacity: 0;
-      animation: fadeIn 1.5s ease forwards 1.5s;
-    }
-
-    /* --- واجهة الشات --- */
-    #chat-app {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #121212;
-      box-shadow: 0 0 30px rgba(0,0,0,0.8);
-      opacity: 0;
+      background-color: #000;
       transition: opacity 1s ease;
     }
 
-    /* الهيدر */
-    .chat-header {
-      display: flex;
-      align-items: center;
-      padding: 15px 20px;
-      background-color: #1e1e1e;
-      border-bottom: 1px solid #2a2a2a;
+    /* فيديو الخلفية (منظر طبيعي خلاب) */
+    .bg-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.85;
     }
 
-    .avatar {
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #6e8efb, #a777e3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
+    /* زر بدء العرض */
+    #start-btn {
+      position: relative;
+      z-index: 20;
+      padding: 16px 36px;
       font-size: 1.2rem;
-      margin-right: 15px;
+      font-weight: bold;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
     }
 
-    .user-info h2 {
-      font-size: 1.1rem;
-      font-weight: 600;
+    #start-btn:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.3);
     }
 
-    .status {
-      font-size: 0.8rem;
-      color: #4CAF50;
-      display: flex;
-      align-items: center;
-      gap: 5px;
+    /* نص السلام بعد 3 ثواني */
+    #greeting-text {
+      position: absolute;
+      z-index: 20;
+      font-size: 3rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #ffffff;
+      text-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+      display: none;
+      animation: fadeIn 0.8s ease forwards;
     }
 
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      background-color: #4CAF50;
-      border-radius: 50%;
-    }
-
-    /* منطقة الرسائل */
-    .chat-messages {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
+    /* --- المشهد الثاني: عالم البنات والوردة --- */
+    #scene-flower {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 5;
+      opacity: 0;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      background-color: #0b0b0b;
-    }
-
-    .message {
-      max-width: 75%;
-      padding: 12px 16px;
-      border-radius: 18px;
-      font-size: 0.95rem;
-      line-height: 1.4;
-      position: relative;
-      word-wrap: break-word;
-    }
-
-    .message.received {
-      align-self: flex-start;
-      background-color: #262626;
-      color: #eaeaea;
-      border-bottom-left-radius: 4px;
-    }
-
-    .message.sent {
-      align-self: flex-end;
-      background-color: #2563eb;
-      color: #ffffff;
-      border-bottom-right-radius: 4px;
-    }
-
-    .meta {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 4px;
-      font-size: 0.7rem;
-      color: rgba(255, 255, 255, 0.6);
-      margin-top: 4px;
-    }
-
-    .seen-status {
-      font-weight: bold;
-      font-size: 0.75rem;
-      transition: color 0.3s;
-    }
-
-    .seen-status.read {
-      color: #38ef7d; /* لون التفعيل عند القراءة Vu */
-    }
-
-    /* منطقة إدخال النص */
-    .chat-input-container {
-      padding: 15px;
-      background-color: #1e1e1e;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      border-top: 1px solid #2a2a2a;
-    }
-
-    .chat-input {
-      flex: 1;
-      padding: 12px 18px;
-      border-radius: 25px;
-      border: 1px solid #333;
-      background-color: #2a2a2a;
-      color: #fff;
-      outline: none;
-      font-size: 0.95rem;
-    }
-
-    .send-btn {
-      background-color: #2563eb;
-      color: white;
-      border: none;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
       justify-content: center;
-      transition: background-color 0.2s;
+      align-items: center;
+      /* خلفية متدرجة أنيقة تعبر عن عالم البنات */
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #feada6 100%);
+      transition: opacity 1.5s ease;
+      padding: 20px;
+      text-align: center;
     }
 
-    .send-btn:hover {
-      background-color: #1d4ed8;
+    .title-text {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 2px 10px rgba(214, 51, 132, 0.4);
+      margin-bottom: 25px;
+      animation: bounce 2s infinite;
     }
 
-    /* Animations */
-    @keyframes fadeInUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    /* تصميم وردة حمراء تفاعلية أنيقة */
+    .flower-container {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      margin: 20px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
+
+    .rose-emoji {
+      font-size: 8rem;
+      filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.15));
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    .message-text {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(8px);
+      padding: 15px 30px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 8px 32px 0 rgba(255, 105, 180, 0.2);
+      margin-top: 25px;
+    }
+
+    /* التأثيرات الحركية (Animations) */
     @keyframes fadeIn {
-      to { opacity: 1; }
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
     }
   </style>
 </head>
 <body>
 
-  <!-- شاشة الترحيب السوداء -->
-  <div id="intro-screen">
-    <div class="welcome-text">WELCOME WE ZIN</div>
-    <div class="sub-text">Private Discussion Room</div>
+  <!-- المشهد الأول: فيديو المنظر الخلاب والموسيقى -->
+  <div id="scene-video">
+    <!-- فيديو منظر طبيعي خلاب للجبال والغيوم (طبيعة بجودة عالية) -->
+    <video id="myVideo" class="bg-video" loop playsinline preload="auto">
+      <source src="https://assets.mixkit.co/videos/preview/mixkit-dramatic-time-lapse-of-clouds-and-mountains-4220-large.mp4" type="video/mp4">
+    </video>
+
+    <!-- زر للبدء لتشغيل الصوت والفيديو بسلاسة -->
+    <button id="start-btn" onclick="startExperience()">✨ Cliquez ici pour commencer</button>
+
+    <!-- كلمة السَلام -->
+    <div id="greeting-text">Slm Slfd</div>
   </div>
 
-  <!-- واجهة المحادثة -->
-  <div id="chat-app">
-    <div class="chat-header">
-      <div class="avatar">WZ</div>
-      <div class="user-info">
-        <h2>WE ZIN</h2>
-        <div class="status" id="user-status">
-          <span class="status-dot"></span> En ligne
-        </div>
-      </div>
+  <!-- صوت موسيقى هادئة وجميلة خلف المنظر الخلاب -->
+  <audio id="bgMusic" loop preload="auto">
+    <source src="https://assets.mixkit.co/music/preview/mixkit-beautiful-dream-493.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- المشهد الثاني: عالم البنات والوردة -->
+  <div id="scene-flower">
+    <div class="title-text">haki hdi werda 🌹</div>
+    
+    <div class="flower-container">
+      <div class="rose-emoji">🌹</div>
     </div>
 
-    <div class="chat-messages" id="messages-container">
-      <!-- الرسائل تظهر هنا -->
-    </div>
-
-    <div class="chat-input-container">
-      <input type="text" id="message-input" class="chat-input" placeholder="Écrivez un message..." onkeypress="handleKeyPress(event)">
-      <button class="send-btn" onclick="sendMessage()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-      </button>
+    <div class="message-text">
+      Tahya nti a vie slfd🫶🏼
     </div>
   </div>
 
   <script>
-    // 1. التحكم في الانتقال من الشاشة السوداء إلى الشات
-    setTimeout(() => {
-      const intro = document.getElementById('intro-screen');
-      const chatApp = document.getElementById('chat-app');
-      
-      intro.style.opacity = '0';
+    function startExperience() {
+      const startBtn = document.getElementById('start-btn');
+      const video = document.getElementById('myVideo');
+      const music = document.getElementById('bgMusic');
+      const greeting = document.getElementById('greeting-text');
+      const sceneVideo = document.getElementById('scene-video');
+      const sceneFlower = document.getElementById('scene-flower');
+
+      // إخفاء الزر وتشغيل الفيديو والموسيقى
+      startBtn.style.display = 'none';
+      video.play();
+      music.play();
+
+      // بعد 3 ثواني بالضبط: يظهر نص "Slm Slfd"
       setTimeout(() => {
-        intro.style.visibility = 'hidden';
-        chatApp.style.opacity = '1';
-        
-        // رسالة ترحيب أولية داخل الشات
-        receiveMessage("Coucou WE ZIN! Bienvenue dans notre espace privé ✨");
-      }, 1200);
-    }, 3000); // تظهر الشاشة السوداء لمدة 3 ثوانٍ
+        greeting.style.display = 'block';
 
-    const messagesContainer = document.getElementById('messages-container');
-    const messageInput = document.getElementById('message-input');
-    const userStatus = document.getElementById('user-status');
+        // بعد ظهور النص بثانيتين: تنتقل الشاشة إلى عالم البنات
+        setTimeout(() => {
+          sceneVideo.style.opacity = '0';
+          
+          setTimeout(() => {
+            sceneVideo.style.display = 'none';
+            sceneFlower.style.opacity = '1';
+          }, 1000);
 
-    function getCurrentTime() {
-      const now = new Date();
-      return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
+        }, 2000);
 
-    // 2. إرسال الرسالة من طرفك
-    function sendMessage() {
-      const text = messageInput.value.trim();
-      if (!text) return;
-
-      const msgId = 'msg-' + Date.now();
-      const time = getCurrentTime();
-
-      const messageHTML = `
-        <div class="message sent" id="${msgId}">
-          <div>${escapeHTML(text)}</div>
-          <div class="meta">
-            <span>${time}</span>
-            <span class="seen-status" id="status-${msgId}">• Envoyé</span>
-          </div>
-        </div>
-      `;
-
-      messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
-      messageInput.value = '';
-      scrollToBottom();
-
-      // محاكاة وضع الـ "Vu" والرد التلقائي
-      simulateResponse(msgId);
-    }
-
-    // 3. محاكاة قراءة الرسالة (Vu) والرد
-    function simulateResponse(msgId) {
-      // تغيير الحالة إلى "جاري الكتابة..." بعد ثانية
-      setTimeout(() => {
-        const statusElement = document.getElementById(`status-${msgId}`);
-        if (statusElement) {
-          statusElement.textContent = '✔ Vu';
-          statusElement.classList.add('read');
-        }
-        userStatus.innerHTML = '<span class="status-dot"></span> Écrit...';
-      }, 1500);
-
-      // إرسال رد تلقائي بسيط تجريبي بعد 3.5 ثانية
-      setTimeout(() => {
-        userStatus.innerHTML = '<span class="status-dot"></span> En ligne';
-        receiveMessage("C'est trop mignon merci! ❤️");
-      }, 3500);
-    }
-
-    // 4. استقبال الرسالة
-    function receiveMessage(text) {
-      const time = getCurrentTime();
-      const messageHTML = `
-        <div class="message received">
-          <div>${escapeHTML(text)}</div>
-          <div class="meta">
-            <span>${time}</span>
-          </div>
-        </div>
-      `;
-      messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
-      scrollToBottom();
-    }
-
-    function handleKeyPress(e) {
-      if (e.key === 'Enter') {
-        sendMessage();
-      }
-    }
-
-    function scrollToBottom() {
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-
-    function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-      );
+      }, 3000);
     }
   </script>
 </body>
